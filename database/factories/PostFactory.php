@@ -35,6 +35,7 @@ class PostFactory extends Factory
             'featured_image_alt' => fake()->optional()->sentence(5),
             'featured_image_caption' => fake()->optional()->sentence(8),
             'featured_image_credit' => fake()->optional()->name(),
+            'detail_images' => [],
             'status' => PostStatus::Draft,
             'is_featured' => false,
             'published_at' => null,

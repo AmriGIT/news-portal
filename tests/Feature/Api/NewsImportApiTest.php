@@ -111,6 +111,7 @@ class NewsImportApiTest extends TestCase
                 'author_id' => 999,
                 'featured_image' => 'images/featured.jpg',
                 'featured_image_alt' => '',
+                'detail_images' => ['images/detail-1.jpg', 'images/detail-2.jpg'],
                 'seo_title' => 'Berita Ekonomi Digital',
                 'seo_description' => 'Ringkasan SEO berita ekonomi digital yang dibuat oleh generator lokal.',
             ],
@@ -139,6 +140,7 @@ class NewsImportApiTest extends TestCase
         $this->assertSame(PostStatus::Draft, $post->status);
         $this->assertNull($post->published_at);
         $this->assertSame('Berita Ekonomi Digital Hari Ini', $post->featured_image_alt);
+        $this->assertCount(2, $post->detail_images);
         $this->assertStringContainsString('posts/content', $post->content);
         $this->assertTrue($post->tags()->where('slug', 'import')->exists());
         $this->assertSame(3, $post->tags()->count());
@@ -153,6 +155,12 @@ class NewsImportApiTest extends TestCase
 
         foreach (app(PostImageService::class)->variantPaths($post->featured_image) as $path) {
             Storage::disk('public')->assertExists($path);
+        }
+
+        foreach ($post->detail_images as $detailImage) {
+            foreach (app(PostImageService::class)->variantPaths($detailImage) as $path) {
+                Storage::disk('public')->assertExists($path);
+            }
         }
     }
 
@@ -526,6 +534,8 @@ class NewsImportApiTest extends TestCase
         if ($includeImages) {
             $this->makeImage($workspace.'/featured.jpg', 1600, 900);
             $this->makeImage($workspace.'/content.jpg', 1200, 675);
+            $this->makeImage($workspace.'/detail-1.jpg', 1600, 900);
+            $this->makeImage($workspace.'/detail-2.jpg', 1600, 900);
         }
 
         $posts ??= [[
@@ -589,6 +599,8 @@ class NewsImportApiTest extends TestCase
         if ($includeImages) {
             $zip->addFile($workspace.'/featured.jpg', 'images/featured.jpg');
             $zip->addFile($workspace.'/content.jpg', 'images/content.jpg');
+            $zip->addFile($workspace.'/detail-1.jpg', 'images/detail-1.jpg');
+            $zip->addFile($workspace.'/detail-2.jpg', 'images/detail-2.jpg');
         }
 
         $zip->close();

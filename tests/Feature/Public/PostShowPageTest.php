@@ -92,6 +92,43 @@ class PostShowPageTest extends TestCase
             ->assertDontSee('Gambar berita tidak tersedia');
     }
 
+    public function test_post_detail_uses_multiple_detail_images_when_available(): void
+    {
+        $post = Post::factory()->published()->create([
+            'title' => 'Berita Dengan Banyak Gambar',
+            'slug' => 'berita-dengan-banyak-gambar',
+            'featured_image' => 'posts/featured/utama.webp',
+            'featured_image_alt' => 'Alt gambar utama',
+            'detail_images' => [
+                'posts/detail/detail-1.webp',
+                'posts/detail/detail-2.webp',
+            ],
+            'published_at' => now(),
+        ]);
+
+        $this->get(route('posts.show', $post->slug))
+            ->assertOk()
+            ->assertSee('detail-1.webp')
+            ->assertSee('detail-2.webp')
+            ->assertSee('Alt gambar utama')
+            ->assertSee('Alt gambar utama - gambar 2');
+    }
+
+    public function test_post_detail_falls_back_to_featured_image_when_detail_images_empty(): void
+    {
+        $post = Post::factory()->published()->create([
+            'title' => 'Berita Fallback Gambar Utama',
+            'slug' => 'berita-fallback-gambar-utama',
+            'featured_image' => 'posts/featured/fallback.webp',
+            'detail_images' => [],
+            'published_at' => now(),
+        ]);
+
+        $this->get(route('posts.show', $post->slug))
+            ->assertOk()
+            ->assertSee('featured/fallback.webp');
+    }
+
     public function test_post_image_alt_never_renders_empty_on_frontend(): void
     {
         config(['media.featured.default_alt' => 'Gambar default portal']);

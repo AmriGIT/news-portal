@@ -151,6 +151,13 @@ class PostInfolist
                         TextEntry::make('featured_image_credit')
                             ->label('Credit')
                             ->placeholder('-'),
+
+                        TextEntry::make('detail_images')
+                            ->label('Gambar Detail')
+                            ->formatStateUsing(fn (mixed $state): string => collect($state ?? [])->filter()->implode("\n"))
+                            ->listWithLineBreaks()
+                            ->placeholder('Memakai featured image')
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Audit')

@@ -31,6 +31,9 @@ class PostObserver
 
         try {
             app(PostImageService::class)->deleteWithVariants($post->featured_image);
+            foreach ($post->detail_images ?? [] as $detailImage) {
+                app(PostImageService::class)->deleteWithVariants(is_array($detailImage) ? ($detailImage['path'] ?? null) : $detailImage);
+            }
         } catch (Throwable $exception) {
             Log::warning('Featured image cleanup on force delete failed.', [
                 'post_id' => $post->id,

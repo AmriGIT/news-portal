@@ -58,6 +58,7 @@ class EditPost extends EditRecord
         $data['status'] = $this->record->status;
         $data['published_at'] = $this->record->published_at;
         $data['featured_image'] = $this->normalizeFeaturedImage($data['featured_image'] ?? null, $this->record->featured_image);
+        $data['detail_images'] = $this->normalizeDetailImages($data['detail_images'] ?? []);
 
         if (isset($data['content'])) {
             $data['content'] = app(ContentSanitizer::class)->sanitize($data['content']);
@@ -76,6 +77,8 @@ class EditPost extends EditRecord
     {
         $oldFeaturedImage = $record->featured_image;
         $newFeaturedImage = $data['featured_image'] ?? null;
+        $oldDetailImages = $this->normalizeDetailImages($record->detail_images ?? []);
+        $newDetailImages = $this->normalizeDetailImages($data['detail_images'] ?? []);
         $oldSlug = $record->slug;
 
         try {
@@ -92,6 +95,7 @@ class EditPost extends EditRecord
             if ($newFeaturedImage !== $oldFeaturedImage) {
                 app(PostImageService::class)->deleteWithVariants($newFeaturedImage);
             }
+            $this->deleteDetailImages(array_diff($newDetailImages, $oldDetailImages));
 
             throw $exception;
         }
@@ -99,6 +103,7 @@ class EditPost extends EditRecord
         if ($newFeaturedImage !== $oldFeaturedImage) {
             app(PostImageService::class)->deleteWithVariants($oldFeaturedImage);
         }
+        $this->deleteDetailImages(array_diff($oldDetailImages, $newDetailImages));
 
         return $record->refresh();
     }
@@ -127,5 +132,27 @@ class EditPost extends EditRecord
         }
 
         return filled($value) ? (string) $value : null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizeDetailImages(mixed $value): array
+    {
+        return collect(is_array($value) ? $value : [])
+            ->map(fn (mixed $path): string => (string) $path)
+            ->filter(fn (string $path): bool => filled($path))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  iterable<string>  $paths
+     */
+    private function deleteDetailImages(iterable $paths): void
+    {
+        foreach ($paths as $path) {
+            app(PostImageService::class)->deleteWithVariants($path);
+        }
     }
 }

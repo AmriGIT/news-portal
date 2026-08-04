@@ -34,6 +34,8 @@ class PostImportTemplateController extends Controller
 
         if (is_file($sampleImagePath)) {
             $zip->addFile($sampleImagePath, 'images/berita-utama.png');
+            $zip->addFile($sampleImagePath, 'images/detail-1.png');
+            $zip->addFile($sampleImagePath, 'images/detail-2.png');
             $zip->addFile($sampleImagePath, 'images/konten-1.png');
         }
 
@@ -63,6 +65,7 @@ class PostImportTemplateController extends Controller
                     'featured_image_alt' => 'Ilustrasi berita utama BebasInfo',
                     'featured_image_caption' => 'Keterangan foto dapat dikosongkan jika tidak diperlukan.',
                     'featured_image_credit' => 'BebasInfo',
+                    'detail_images' => ['images/detail-1.png', 'images/detail-2.png'],
                     'seo_title' => 'Contoh Berita Import BebasInfo',
                     'seo_description' => 'Deskripsi SEO berita import sekitar 150 sampai 160 karakter agar terbaca baik di mesin pencari.',
                     'robots_index' => true,
@@ -88,6 +91,8 @@ class PostImportTemplateController extends Controller
             '- Maksimal 5 MB.',
             '- Resolusi minimal 1200 x 675 piksel.',
             '- Jika featured_image dikosongkan, frontend memakai default image.',
+            '- detail_images opsional. Jika kosong, halaman detail memakai featured_image.',
+            '- detail_images berupa array path relatif di ZIP, contoh ["images/detail-1.png", "images/detail-2.png"].',
             '',
         ]);
     }

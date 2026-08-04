@@ -18,17 +18,38 @@
             </div>
         </header>
 
+        @php
+            $detailImages = $post->detailImagesForDisplay();
+        @endphp
+
         <figure class="mt-8">
-            <x-public.responsive-image
-                :path="$post->featured_image"
-                :alt="$post->featured_image_alt ?: $post->title"
-                class="aspect-video w-full rounded-sm object-cover"
-                sizes="(min-width: 1024px) 896px, 100vw"
-                loading="eager"
-                fetchpriority="high"
-                width="1600"
-                height="900"
-            />
+            @if (count($detailImages) > 1)
+                <div class="grid gap-3">
+                    @foreach ($detailImages as $imageIndex => $imagePath)
+                        <x-public.responsive-image
+                            :path="$imagePath"
+                            :alt="$imageIndex === 0 ? ($post->featured_image_alt ?: $post->title) : (($post->featured_image_alt ?: $post->title).' - gambar '.($imageIndex + 1))"
+                            class="aspect-video w-full rounded-sm object-cover"
+                            sizes="(min-width: 1024px) 896px, 100vw"
+                            :loading="$imageIndex === 0 ? 'eager' : 'lazy'"
+                            :fetchpriority="$imageIndex === 0 ? 'high' : 'auto'"
+                            width="1600"
+                            height="900"
+                        />
+                    @endforeach
+                </div>
+            @else
+                <x-public.responsive-image
+                    :path="$detailImages[0] ?? null"
+                    :alt="$post->featured_image_alt ?: $post->title"
+                    class="aspect-video w-full rounded-sm object-cover"
+                    sizes="(min-width: 1024px) 896px, 100vw"
+                    loading="eager"
+                    fetchpriority="high"
+                    width="1600"
+                    height="900"
+                />
+            @endif
             @if (filled($post->featured_image_caption) || filled($post->featured_image_credit))
                 <figcaption class="mt-3 text-sm leading-6 text-bebas-gray">
                     @if (filled($post->featured_image_caption))

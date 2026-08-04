@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'featured_image_alt',
     'featured_image_caption',
     'featured_image_credit',
+    'detail_images',
     'status',
     'is_featured',
     'published_at',
@@ -78,6 +79,20 @@ class Post extends Model
     public function redirects(): HasMany
     {
         return $this->hasMany(PostRedirect::class);
+    }
+
+    /**
+     * @return array<int, ?string>
+     */
+    public function detailImagesForDisplay(): array
+    {
+        $images = collect($this->detail_images ?? [])
+            ->map(fn (mixed $image): ?string => is_array($image) ? ($image['path'] ?? null) : (is_string($image) ? $image : null))
+            ->filter(fn (?string $path): bool => filled($path))
+            ->values()
+            ->all();
+
+        return $images !== [] ? $images : [$this->featured_image];
     }
 
     /**
@@ -157,6 +172,7 @@ class Post extends Model
     {
         return [
             'is_featured' => 'boolean',
+            'detail_images' => 'array',
             'published_at' => 'datetime',
             'robots_follow' => 'boolean',
             'robots_index' => 'boolean',

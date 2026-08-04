@@ -31,6 +31,7 @@ class CreatePost extends CreateRecord
         $data['robots_index'] = $user?->isAdmin() ? ($data['robots_index'] ?? true) : true;
         $data['robots_follow'] = $user?->isAdmin() ? ($data['robots_follow'] ?? true) : true;
         $data['featured_image'] = $this->normalizeFeaturedImage($data['featured_image'] ?? null);
+        $data['detail_images'] = $this->normalizeDetailImages($data['detail_images'] ?? []);
 
         if (isset($data['content'])) {
             $data['content'] = app(ContentSanitizer::class)->sanitize($data['content']);
@@ -45,6 +46,7 @@ class CreatePost extends CreateRecord
             return DB::transaction(fn (): Model => parent::handleRecordCreation($data));
         } catch (Throwable $exception) {
             app(PostImageService::class)->deleteWithVariants($data['featured_image'] ?? null);
+            $this->deleteDetailImages($data['detail_images'] ?? []);
 
             throw $exception;
         }
@@ -64,5 +66,27 @@ class CreatePost extends CreateRecord
         }
 
         return filled($value) ? (string) $value : null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function normalizeDetailImages(mixed $value): array
+    {
+        return collect(is_array($value) ? $value : [])
+            ->map(fn (mixed $path): string => (string) $path)
+            ->filter(fn (string $path): bool => filled($path))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  iterable<string>  $paths
+     */
+    private function deleteDetailImages(iterable $paths): void
+    {
+        foreach ($paths as $path) {
+            app(PostImageService::class)->deleteWithVariants($path);
+        }
     }
 }

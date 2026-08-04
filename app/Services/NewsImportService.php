@@ -188,6 +188,7 @@ class NewsImportService
         $tagIds = $this->tagIds($payload['tags'] ?? []);
         $content = $this->content($payload['content'], $extractPath);
         $featuredImage = $this->featuredImage($payload['featured_image'] ?? null, $extractPath);
+        $detailImages = $this->detailImages($payload['detail_images'] ?? [], $extractPath);
         $sourceIds = $postSourceMap[(string) ($payload['slug'] ?? $slug)] ?? [];
         $finalStatus = $publishMode === 'published' ? PostStatus::Published : PostStatus::Draft;
         $authorId = $this->authorId($newsImport);
@@ -204,6 +205,7 @@ class NewsImportService
             'featured_image_alt' => $this->altText($payload['featured_image_alt'] ?? null, $title),
             'featured_image_caption' => $this->nullableString($payload['featured_image_caption'] ?? null),
             'featured_image_credit' => $this->nullableString($payload['featured_image_credit'] ?? 'BebasInfo'),
+            'detail_images' => $detailImages,
             'status' => $finalStatus,
             'is_featured' => (bool) ($payload['is_featured'] ?? false),
             'published_at' => $finalStatus === PostStatus::Published ? now() : null,
@@ -267,6 +269,10 @@ class NewsImportService
 
         if (isset($payload['tags']) && ! is_array($payload['tags'])) {
             throw new RuntimeException('Tags harus berupa array.');
+        }
+
+        if (isset($payload['detail_images']) && ! is_array($payload['detail_images'])) {
+            throw new RuntimeException('Detail images harus berupa array.');
         }
     }
 
@@ -354,6 +360,38 @@ class NewsImportService
         $file = new UploadedFile($imagePath, basename($imagePath), null, null, true);
 
         return $this->images->storeFeaturedImage($file)['original'];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function detailImages(mixed $paths, string $extractPath): array
+    {
+        if (! is_array($paths)) {
+            return [];
+        }
+
+        return collect($paths)
+            ->map(fn (mixed $item): ?string => is_array($item) ? ($item['path'] ?? null) : (is_string($item) ? $item : null))
+            ->filter(fn (?string $path): bool => filled($path))
+            ->map(function (string $path) use ($extractPath): ?string {
+                try {
+                    $imagePath = $this->resolveImportFile($path, $extractPath);
+                } catch (RuntimeException $exception) {
+                    if ($this->isMissingImageException($exception)) {
+                        return null;
+                    }
+
+                    throw $exception;
+                }
+
+                $file = new UploadedFile($imagePath, basename($imagePath), null, null, true);
+
+                return $this->images->storeFeaturedImage($file)['original'];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
     private function importContentImages(string $content, string $extractPath): string

@@ -405,6 +405,7 @@ Contoh `posts.json`:
       "featured_image_alt": "Ilustrasi berita utama",
       "featured_image_caption": "Keterangan foto",
       "featured_image_credit": "BebasInfo",
+      "detail_images": ["images/detail-1.jpg", "images/detail-2.jpg"],
       "seo_title": "Judul SEO berita",
       "seo_description": "Deskripsi SEO berita sekitar 160 karakter."
     }
@@ -416,6 +417,7 @@ Catatan import:
 
 - `posts.json` wajib berada di root ZIP.
 - `featured_image` dan gambar di dalam `content` memakai path relatif di dalam ZIP.
+- `detail_images` opsional, berupa array path relatif di dalam ZIP. Jika kosong, detail artikel memakai `featured_image`.
 - Jika `featured_image` kosong, frontend otomatis memakai default image.
 - Gambar utama tetap divalidasi: JPG, JPEG, PNG, atau WebP; maksimal 5 MB; resolusi minimal 1200 x 675 piksel.
 - Kategori dan tag akan dibuat otomatis jika belum ada.

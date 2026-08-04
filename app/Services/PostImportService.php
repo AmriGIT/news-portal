@@ -116,6 +116,7 @@ class PostImportService
         $publishedAt = $this->publishedAt($record['published_at'] ?? null, $status);
         $content = $this->importContentImages($content, $extractPath);
         $featuredImage = $this->featuredImage($record['featured_image'] ?? null, $extractPath);
+        $detailImages = $this->detailImages($record['detail_images'] ?? [], $extractPath);
 
         $post = Post::query()->create([
             'author_id' => $this->userId($record['author_id'] ?? null) ?: $actor->id,
@@ -129,6 +130,7 @@ class PostImportService
             'featured_image_alt' => $this->nullableString($record['featured_image_alt'] ?? $title),
             'featured_image_caption' => $this->nullableString($record['featured_image_caption'] ?? null),
             'featured_image_credit' => $this->nullableString($record['featured_image_credit'] ?? null),
+            'detail_images' => $detailImages,
             'status' => $status,
             'is_featured' => (bool) ($record['is_featured'] ?? false),
             'published_at' => $publishedAt,
@@ -293,6 +295,38 @@ class PostImportService
         $file = new UploadedFile($imagePath, basename($imagePath), null, null, true);
 
         return $this->images->storeFeaturedImage($file)['original'];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function detailImages(mixed $paths, string $extractPath): array
+    {
+        if (! is_array($paths)) {
+            return [];
+        }
+
+        return collect($paths)
+            ->map(fn (mixed $item): ?string => is_array($item) ? ($item['path'] ?? null) : (is_string($item) ? $item : null))
+            ->filter(fn (?string $path): bool => filled($path))
+            ->map(function (string $path) use ($extractPath): ?string {
+                try {
+                    $imagePath = $this->resolveImportFile($path, $extractPath);
+                } catch (RuntimeException $exception) {
+                    if ($this->isMissingImageException($exception)) {
+                        return null;
+                    }
+
+                    throw $exception;
+                }
+
+                $file = new UploadedFile($imagePath, basename($imagePath), null, null, true);
+
+                return $this->images->storeFeaturedImage($file)['original'];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
     private function importContentImages(string $content, string $extractPath): string

@@ -55,6 +55,7 @@ Struktur:
       "featured_image_alt": "",
       "featured_image_caption": "",
       "featured_image_credit": "BebasInfo",
+      "detail_images": [],
       "seo_title": "",
       "seo_description": "",
       "robots_index": true,
@@ -151,6 +152,12 @@ images/[slug].jpg
 
 - Gunakan `BebasInfo`.
 
+`detail_images`
+
+- Opsional.
+- Gunakan array path relatif, contoh `["images/detail-1.jpg", "images/detail-2.jpg"]`.
+- Jika kosong, halaman detail memakai `featured_image`.
+
 `seo_title`
 
 - Maksimal sekitar 60 karakter.
@@ -232,6 +239,7 @@ Output harus berupa JSON valid untuk `posts.json`.
       "featured_image_alt": "Ilustrasi warga menggunakan layanan publik digital melalui laptop",
       "featured_image_caption": "Ilustrasi pemanfaatan layanan publik digital oleh masyarakat.",
       "featured_image_credit": "BebasInfo",
+      "detail_images": [],
       "seo_title": "Layanan Publik Digital dan Manfaatnya bagi Warga",
       "seo_description": "Layanan publik digital memudahkan akses administrasi warga, tetapi keamanan data dan literasi digital tetap perlu diperhatikan.",
       "robots_index": true,
@@ -241,4 +249,3 @@ Output harus berupa JSON valid untuk `posts.json`.
   ]
 }
 ```
-

@@ -270,6 +270,39 @@ class PostForm
                         TextInput::make('featured_image_credit')
                             ->label('Kredit Foto')
                             ->maxLength(255),
+
+                        FileUpload::make('detail_images')
+                            ->label('Gambar Detail')
+                            ->disk(config('media.disk', 'public'))
+                            ->visibility('public')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->maxFiles(8)
+                            ->acceptedFileTypes(config('media.accepted_mime_types'))
+                            ->maxSize((int) config('media.featured.max_size', 5120))
+                            ->previewable()
+                            ->openable()
+                            ->downloadable()
+                            ->pasteable(false)
+                            ->preventFilePathTampering()
+                            ->rule(
+                                Rule::dimensions()
+                                    ->minWidth((int) config('media.featured.min_width', 1200))
+                                    ->minHeight((int) config('media.featured.min_height', 675))
+                            )
+                            ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
+                                try {
+                                    return app(PostImageService::class)->storeFeaturedImage($file)['original'];
+                                } catch (RuntimeException $exception) {
+                                    throw ValidationException::withMessages([
+                                        'detail_images' => $exception->getMessage(),
+                                    ]);
+                                }
+                            })
+                            ->helperText('Opsional. Jika kosong, halaman detail memakai gambar utama. Urutan gambar dapat diatur ulang.')
+                            ->columnSpanFull(),
                     ]),
             ]);
     }
