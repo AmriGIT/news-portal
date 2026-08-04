@@ -13,7 +13,7 @@ Gunakan data berikut sebagai sumber:
 ```text
 JUMLAH_BERITA: [isi jumlah berita]
 TOPIK_UTAMA: [isi topik utama]
-KATEGORI: [Nasional/Ekonomi/Teknologi/Olahraga/Gaya Hidup/dll]
+KATEGORI: [Nasional/Ekonomi/Teknologi c/Olahraga/Gaya Hidup/dll]
 LOKASI: [opsional]
 TANGGAL_PUBLIKASI: [YYYY-MM-DD HH:mm:ss atau kosong]
 STATUS: draft

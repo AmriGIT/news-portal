@@ -81,6 +81,48 @@ class PostImportServiceTest extends TestCase
         }
     }
 
+    public function test_admin_import_uses_default_frontend_fallback_when_featured_image_file_is_missing(): void
+    {
+        if (! class_exists(ZipArchive::class)) {
+            $this->markTestSkipped('ZipArchive belum tersedia.');
+        }
+
+        $admin = User::factory()->admin()->create();
+        $workspace = storage_path('framework/testing/imports/'.Str::uuid());
+        File::ensureDirectoryExists($workspace);
+
+        try {
+            $zipPath = $workspace.'/posts.zip';
+            $this->makeZip($zipPath, [
+                'posts' => [
+                    [
+                        'title' => 'Berita Import Default Missing',
+                        'slug' => 'berita-import-default-missing',
+                        'excerpt' => 'Ringkasan import.',
+                        'content' => '<p>Konten import tanpa gambar.</p>',
+                        'category' => 'Nasional',
+                        'tags' => ['Import', 'Default'],
+                        'status' => PostStatus::Draft->value,
+                        'featured_image' => 'images/default.png',
+                        'featured_image_alt' => 'Default image',
+                    ],
+                ],
+            ], []);
+
+            $result = app(PostImportService::class)->importFromZip($zipPath, $admin);
+
+            $this->assertSame(1, $result['imported']);
+            $this->assertSame(0, $result['failed']);
+
+            $post = Post::query()->where('slug', 'berita-import-default-missing')->firstOrFail();
+
+            $this->assertNull($post->featured_image);
+            $this->assertSame('Default image', $post->featured_image_alt);
+        } finally {
+            File::deleteDirectory($workspace);
+        }
+    }
+
     /**
      * @param  array<string, mixed>  $manifest
      * @param  array<string, string>  $files

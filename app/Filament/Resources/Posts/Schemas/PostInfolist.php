@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Posts\Schemas;
 
 use App\Enums\PostStatus;
 use App\Models\Post;
+use App\Services\PostImageUrlService;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -119,6 +121,21 @@ class PostInfolist
                 Section::make('Gambar')
                     ->columns(2)
                     ->schema([
+                        ImageEntry::make('featured_image')
+                            ->label('Preview Featured Image')
+                            ->disk(config('media.disk', 'public'))
+                            ->visibility('public')
+                            ->defaultImageUrl(fn (): string => app(PostImageUrlService::class)->original(null))
+                            ->alt(fn (Post $record): string => app(PostImageUrlService::class)->alt($record->featured_image_alt, $record->title))
+                            ->imageWidth('min(100%, 42rem)')
+                            ->imageHeight('auto')
+                            ->extraImgAttributes([
+                                'class' => 'rounded-lg object-cover',
+                            ])
+                            ->openUrlInNewTab()
+                            ->url(fn (Post $record): string => app(PostImageUrlService::class)->original($record->featured_image))
+                            ->columnSpanFull(),
+
                         TextEntry::make('featured_image')
                             ->label('Path Featured Image')
                             ->placeholder('-'),

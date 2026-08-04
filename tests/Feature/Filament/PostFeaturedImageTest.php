@@ -158,6 +158,24 @@ class PostFeaturedImageTest extends TestCase
         }
     }
 
+    public function test_admin_post_view_shows_featured_image_preview(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('posts/featured-preview.webp', 'preview');
+
+        $admin = User::factory()->admin()->create();
+        $post = Post::factory()->published()->create([
+            'featured_image' => 'posts/featured-preview.webp',
+            'featured_image_alt' => 'Preview gambar berita',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(PostResource::getUrl('view', ['record' => $post]))
+            ->assertOk()
+            ->assertSee('posts/featured-preview.webp')
+            ->assertSee('Preview gambar berita');
+    }
+
     public function test_editor_cannot_upload_featured_image_on_published_post(): void
     {
         $editor = User::factory()->editor()->create();

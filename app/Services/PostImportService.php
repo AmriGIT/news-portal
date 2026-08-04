@@ -280,7 +280,16 @@ class PostImportService
             return null;
         }
 
-        $imagePath = $this->resolveImportFile((string) $path, $extractPath);
+        try {
+            $imagePath = $this->resolveImportFile((string) $path, $extractPath);
+        } catch (RuntimeException $exception) {
+            if ($this->isMissingImageException($exception)) {
+                return null;
+            }
+
+            throw $exception;
+        }
+
         $file = new UploadedFile($imagePath, basename($imagePath), null, null, true);
 
         return $this->images->storeFeaturedImage($file)['original'];
@@ -362,6 +371,11 @@ class PostImportService
         }
 
         return implode(DIRECTORY_SEPARATOR, $segments);
+    }
+
+    private function isMissingImageException(RuntimeException $exception): bool
+    {
+        return str_contains($exception->getMessage(), 'tidak ditemukan');
     }
 
     private function uniquePostSlug(mixed $value): string

@@ -421,6 +421,99 @@ Catatan import:
 - Kategori dan tag akan dibuat otomatis jika belum ada.
 - Slug duplikat akan diberi suffix otomatis, misalnya `judul-berita-2`.
 
+### BebasInfo News Import API
+
+Generator Python lokal dapat mengirim hasil berita ke Laravel melalui endpoint API:
+
+```http
+POST /api/import/news
+Authorization: Bearer {IMPORT_TOKEN}
+Accept: application/json
+Content-Type: multipart/form-data
+```
+
+Field multipart:
+
+```text
+package=bebasinfo-import.zip
+publish_mode=draft|published
+```
+
+Struktur ZIP API:
+
+```text
+bebasinfo-import.zip
++-- manifest.json
++-- posts.json
++-- sources.json
++-- images/
+    +-- featured.jpg
+    +-- content.webp
+```
+
+Token import dibuat Admin lewat menu dashboard `Import Berita > Import Tokens`. Token hanya tampil satu kali setelah dibuat, disimpan sebagai hash, dapat diberi expiry, dapat dicabut, dan memiliki abilities:
+
+```text
+news:import
+news:publish
+```
+
+Aturan status API:
+
+- `publish_mode=draft` hanya membutuhkan `news:import`, menyimpan `status=draft`, dan `published_at=null`.
+- `publish_mode=published` membutuhkan `news:import` dan `news:publish`.
+- Laravel selalu menentukan `published_at=now()` untuk publish dan mengabaikan `published_at`, `author_id`, `user_id`, serta status dari `posts.json`.
+- Header `Idempotency-Key` dapat dikirim agar retry dari Python tidak membuat post duplikat.
+
+Keamanan import API:
+
+- Endpoint memakai Bearer Import Token khusus, bukan password admin, session cookie, atau CSRF token.
+- ZIP disimpan dan diekstrak di private storage sementara, bukan public storage.
+- ZIP slip, path traversal, absolute path, nested ZIP, file PHP, `.env`, script, executable, dan file selain `manifest.json`, `posts.json`, `sources.json`, atau `images/*.{jpg,jpeg,png,webp}` ditolak.
+- Batas ukuran, jumlah artikel, jumlah file, total ekstraksi, publish permission, fallback image, rate limit, dan retention diatur di `config/news-import.php`.
+- Sumber artikel dari `sources.json` disimpan sebagai audit metadata, tanpa raw HTML sumber.
+- Satu artikel gagal tidak menggagalkan seluruh package; item gagal dicatat di `News Imports`.
+
+Environment API import:
+
+```env
+NEWS_IMPORT_ENABLED=true
+NEWS_IMPORT_ASYNC=false
+NEWS_IMPORT_MAX_ZIP_MB=50
+NEWS_IMPORT_MAX_POSTS=20
+NEWS_IMPORT_MAX_FILES=100
+NEWS_IMPORT_MAX_UNCOMPRESSED_MB=200
+NEWS_IMPORT_ALLOW_PUBLISH=true
+NEWS_IMPORT_ALLOW_DEFAULT_IMAGE=true
+NEWS_IMPORT_DEFAULT_IMAGE_PATH=
+NEWS_IMPORT_TOKEN_EXPIRY_DAYS=90
+NEWS_IMPORT_RATE_LIMIT=10
+NEWS_IMPORT_LOG_RETENTION_DAYS=90
+NEWS_IMPORT_STRICT_MODE=false
+```
+
+Endpoint status import:
+
+```http
+GET /api/import/news/{uuid}
+Authorization: Bearer {IMPORT_TOKEN}
+Accept: application/json
+```
+
+Maintenance import:
+
+```bash
+php artisan news-imports:cleanup
+```
+
+Scheduler menjalankan cleanup harian pukul `02:30`. Di cPanel, pasang cron untuk menjalankan Laravel scheduler, misalnya:
+
+```bash
+* * * * * cd /home/USER/news-portal && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Untuk production, pastikan `storage` writable, `php artisan migrate --force` sudah dijalankan, `php artisan storage:link` tersedia atau diganti mekanisme symlink provider, endpoint memakai HTTPS, dan batas PHP seperti `upload_max_filesize`, `post_max_size`, `memory_limit`, serta `max_execution_time` cukup untuk ZIP import.
+
 Aturan Resource Berita:
 
 - Admin dapat melihat seluruh berita, membuat draft, mengedit seluruh berita, mengatur penulis, memilih peninjau, mengatur featured dan robots, menjalankan workflow lengkap, soft delete, melihat trashed, restore, dan force delete sesuai policy.
