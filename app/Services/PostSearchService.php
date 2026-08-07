@@ -41,13 +41,13 @@ class PostSearchService
             ->published()
             ->where(function (Builder $query) use ($contains): void {
                 $query
-                    ->whereRaw("title LIKE ? ESCAPE '\\'", [$contains])
-                    ->orWhereRaw("excerpt LIKE ? ESCAPE '\\'", [$contains])
-                    ->orWhereRaw("content LIKE ? ESCAPE '\\'", [$contains])
-                    ->orWhereHas('category', fn (Builder $query): Builder => $query->whereRaw("name LIKE ? ESCAPE '\\'", [$contains]));
+                    ->whereRaw("title LIKE ? ESCAPE '\\\\'", [$contains])
+                    ->orWhereRaw("excerpt LIKE ? ESCAPE '\\\\'", [$contains])
+                    ->orWhereRaw("content LIKE ? ESCAPE '\\\\'", [$contains])
+                    ->orWhereHas('category', fn (Builder $query): Builder => $query->whereRaw("name LIKE ? ESCAPE '\\\\'", [$contains]));
             })
             ->orderByRaw(
-                "CASE WHEN title = ? THEN 1 WHEN title LIKE ? ESCAPE '\\' THEN 2 WHEN title LIKE ? ESCAPE '\\' THEN 3 WHEN excerpt LIKE ? ESCAPE '\\' THEN 4 ELSE 5 END",
+                "CASE WHEN title = ? THEN 1 WHEN title LIKE ? ESCAPE '\\\\' THEN 2 WHEN title LIKE ? ESCAPE '\\\\' THEN 3 WHEN excerpt LIKE ? ESCAPE '\\\\' THEN 4 ELSE 5 END",
                 [$keyword, $startsWith, $contains, $contains],
             )
             ->latestPublished();

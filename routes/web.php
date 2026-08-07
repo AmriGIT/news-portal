@@ -35,5 +35,12 @@ Route::get('/sitemaps/posts.xml', [SitemapController::class, 'posts'])->name('si
 Route::get('/sitemaps/categories.xml', [SitemapController::class, 'categories'])->name('sitemap.categories');
 Route::get('/sitemaps/tags.xml', [SitemapController::class, 'tags'])->name('sitemap.tags');
 Route::get('/robots.txt', RobotsController::class)->name('robots');
+Route::get('/ads.txt', function () {
+    $client = config('services.adsense.client_id');
+    $pubId = filled($client) ? preg_replace('/^ca-/', '', $client) : 'pub-0000000000000000';
+    $content = "google.com, {$pubId}, DIRECT, f08c47fec0942fa0\n";
+    return response($content, 200)->header('Content-Type', 'text/plain');
+})->name('ads.txt');
 Route::get('/feed', FeedController::class)->name('feed');
 Route::redirect('/rss.xml', '/feed')->name('feed.rss');
+

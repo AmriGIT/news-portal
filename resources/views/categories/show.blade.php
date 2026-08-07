@@ -1,5 +1,9 @@
 <x-layouts.public :seo="$seo" :structured-data="$structuredData ?? []">
-    <div class="mx-auto max-w-[1140px] px-4 py-8 md:px-6 lg:py-10">
+    <x-public.content-with-sidebar>
+        <x-slot:sidebar>
+            <x-public.sidebar :popular-posts="$sidebarPopularPosts" :tags="$sidebarTags" />
+        </x-slot:sidebar>
+
         <x-public.breadcrumb :items="array_slice($breadcrumbs ?? [], 1)" />
 
         <header class="mb-8">
@@ -10,7 +14,7 @@
         </header>
 
         @if ($posts->isNotEmpty())
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-5 sm:grid-cols-2">
                 @foreach ($posts as $post)
                     <x-public.post-card :post="$post" />
                 @endforeach
@@ -22,5 +26,5 @@
         @else
             <x-public.empty-state title="Belum ada berita di kategori ini" />
         @endif
-    </div>
+    </x-public.content-with-sidebar>
 </x-layouts.public>

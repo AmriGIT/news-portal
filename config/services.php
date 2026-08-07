@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'adsense' => [
+        'client_id' => env('ADSENSE_CLIENT_ID'),
+        'sidebar_slot' => env('ADSENSE_SIDEBAR_SLOT'),
+        'in_article_slot' => env('ADSENSE_IN_ARTICLE_SLOT'),
+    ],
+
 ];

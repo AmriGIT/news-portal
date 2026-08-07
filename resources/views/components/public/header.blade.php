@@ -6,7 +6,7 @@
 @endphp
 
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-    <div class="mx-auto flex max-w-[1140px] items-center justify-between gap-4 px-4 py-3 md:px-6">
+    <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-3 md:px-6">
         <a href="{{ route('home') }}" class="flex shrink-0 items-center rounded-sm focus:outline-none focus:ring-2 focus:ring-bebas-blue focus:ring-offset-2" aria-label="{{ $siteName }}">
             <span class="block h-11 w-36 overflow-hidden sm:w-44 lg:w-48">
                 <img

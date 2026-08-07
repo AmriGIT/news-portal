@@ -10,7 +10,7 @@
 
 <footer class="mt-16 bg-bebas-navy text-white">
     <div @class([
-        'mx-auto grid max-w-[1140px] gap-8 px-4 py-10 md:px-6',
+        'mx-auto grid max-w-[1400px] gap-8 px-4 py-10 md:px-6',
         'md:grid-cols-3' => $hasContact,
         'md:grid-cols-2' => ! $hasContact,
     ])>

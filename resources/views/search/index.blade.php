@@ -1,5 +1,5 @@
 <x-layouts.public :seo="$seo" :structured-data="$structuredData ?? []">
-    <div class="mx-auto max-w-[1140px] px-4 py-8 md:px-6 lg:py-10">
+    <div class="mx-auto max-w-[1400px] px-4 py-8 md:px-6 lg:py-10">
         <x-public.breadcrumb :items="array_slice($breadcrumbs ?? [], 1)" />
 
         <header class="mb-8">

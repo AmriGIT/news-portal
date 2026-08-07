@@ -69,6 +69,11 @@
             @json($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         </script>
     @endif
+    @if (filled(config('services.adsense.client_id')))
+        <meta name="adsense-client-id" content="{{ config('services.adsense.client_id') }}">
+        <meta name="adsense-in-article-slot" content="{{ config('services.adsense.in_article_slot') }}">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ config('services.adsense.client_id') }}" crossorigin="anonymous"></script>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
