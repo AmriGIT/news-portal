@@ -8,8 +8,8 @@ return [
         'default_image' => env('MEDIA_DEFAULT_FEATURED_IMAGE', '/images/default.png'),
         'default_alt' => env('MEDIA_DEFAULT_FEATURED_ALT', 'Gambar berita'),
         'max_size' => 5120,
-        'min_width' => 1200,
-        'min_height' => 675,
+        'min_width' => env('MEDIA_MIN_WIDTH', 800),
+        'min_height' => env('MEDIA_MIN_HEIGHT', 450),
         'quality' => 82,
         'sizes' => [
             'original' => [1600, 900],
