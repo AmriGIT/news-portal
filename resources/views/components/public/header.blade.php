@@ -2,7 +2,7 @@
 
 @php
     $siteName = $site['name'] ?? config('app.name');
-    $headerLogoUrl = asset('images/header logo.png');
+    $headerLogoUrl = asset('images/header-logo.webp');
 @endphp
 
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">

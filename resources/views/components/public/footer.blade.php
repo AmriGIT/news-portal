@@ -1,7 +1,7 @@
 @props(['site' => []])
 
 @php
-    $footerLogoUrl = asset('images/logo-footer.png');
+    $footerLogoUrl = asset('images/logo-footer.webp');
     $hasContact = filled($site['contactEmail'] ?? null)
         || filled($site['contactPhone'] ?? null)
         || filled($site['contactAddress'] ?? null)

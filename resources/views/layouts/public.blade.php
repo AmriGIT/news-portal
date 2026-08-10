@@ -9,6 +9,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{-- Performance: Preconnect & DNS Prefetch --}}
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    @if (filled(config('services.adsense.client_id')))
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+    @endif
+
     <title>{{ $seo->title ?? $siteName }}</title>
     @if (filled($seo?->description ?? null))
         <meta name="description" content="{{ $seo->description }}">
