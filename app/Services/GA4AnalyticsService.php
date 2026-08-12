@@ -43,10 +43,22 @@ class GA4AnalyticsService
     }
 
     /**
+     * Check if GA4 Data API SDK class is installed via Composer.
+     */
+    public function isSdkInstalled(): bool
+    {
+        return class_exists(BetaAnalyticsDataClient::class);
+    }
+
+    /**
      * Check if GA4 Data API is configured with valid credentials and property ID.
      */
     public function isConfigured(): bool
     {
+        if (! $this->isSdkInstalled()) {
+            return false;
+        }
+
         if (empty($this->propertyId)) {
             return false;
         }
@@ -82,6 +94,17 @@ class GA4AnalyticsService
      */
     public function getVisitorOverview(int $days = 30): array
     {
+        if (! $this->isSdkInstalled()) {
+            return [
+                'configured' => false,
+                'active_users' => 0,
+                'pageviews' => 0,
+                'sessions' => 0,
+                'bounce_rate' => 0.0,
+                'message' => 'Package google/analytics-data belum terpasang di cPanel (Jalankan composer install)',
+            ];
+        }
+
         if (! $this->isConfigured()) {
             return [
                 'configured' => false,
@@ -141,7 +164,6 @@ class GA4AnalyticsService
             } catch (\Throwable $e) {
                 Log::error('GA4 API Error: ' . $e->getMessage());
 
-                // Shorten common error messages for clear dashboard display
                 $msg = $e->getMessage();
                 if (str_contains($msg, 'PERFORM_ACCESS') || str_contains($msg, 'permission')) {
                     $msg = 'Email Service Account belum diberi akses Viewer di GA4 Admin';
@@ -221,7 +243,7 @@ class GA4AnalyticsService
             return [];
         }
 
-        return Cache::remember("ga4_device_breakdown_{$days}", 300, function () use ($days) {
+        return Cache::remember("ga4_device_breakdown_{$days}", 900, function () use ($days) {
             try {
                 $client = new BetaAnalyticsDataClient([
                     'credentials' => $this->getCredentialsPath(),
@@ -270,7 +292,7 @@ class GA4AnalyticsService
             return ['labels' => [], 'users' => [], 'pageviews' => []];
         }
 
-        return Cache::remember("ga4_daily_trend_{$days}", 300, function () use ($days) {
+        return Cache::remember("ga4_daily_trend_{$days}", 900, function () use ($days) {
             try {
                 $client = new BetaAnalyticsDataClient([
                     'credentials' => $this->getCredentialsPath(),
