@@ -41,4 +41,10 @@ return [
         'in_article_slot' => env('ADSENSE_IN_ARTICLE_SLOT'),
     ],
 
+    'ga4' => [
+        'measurement_id' => env('GA4_MEASUREMENT_ID'),
+        'property_id' => env('GA4_PROPERTY_ID'),
+        'credentials' => env('GA4_CREDENTIALS_PATH', storage_path('app/ga4-credentials.json')),
+    ],
+
 ];

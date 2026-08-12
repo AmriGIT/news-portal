@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "filament/filament": "^5.7",
+        "google/analytics-data": "^0.25.0",
         "intervention/image": "^4.2",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0"

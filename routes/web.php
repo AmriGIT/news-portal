@@ -44,3 +44,6 @@ Route::get('/ads.txt', function () {
 Route::get('/feed', FeedController::class)->name('feed');
 Route::redirect('/rss.xml', '/feed')->name('feed.rss');
 
+// GA4 visitor count API (used by dashboard widget)
+Route::get('/admin/analytics/ga4', [App\Http\Controllers\AnalyticsController::class, 'ga4Visitors'])
+    ->name('admin.analytics.ga4');

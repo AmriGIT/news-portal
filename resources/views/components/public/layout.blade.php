@@ -79,16 +79,6 @@
             @json($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         </script>
     @endif
-    @if (filled(config('services.ga4.measurement_id')))
-        {{-- Google Analytics 4 --}}
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.ga4.measurement_id') }}"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '{{ config('services.ga4.measurement_id') }}');
-        </script>
-    @endif
     @if (filled(config('services.adsense.client_id')))
         <meta name="adsense-client-id" content="{{ config('services.adsense.client_id') }}">
         <meta name="adsense-in-article-slot" content="{{ config('services.adsense.in_article_slot') }}">
