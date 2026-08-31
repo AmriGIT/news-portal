@@ -5,14 +5,14 @@
     $headerLogoUrl = asset('images/header-logo.webp');
 @endphp
 
-<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-    <div class="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-3 md:px-6">
-        <a href="{{ route('home') }}" class="flex shrink-0 items-center rounded-sm focus:outline-none focus:ring-2 focus:ring-bebas-blue focus:ring-offset-2" aria-label="{{ $siteName }}">
-            <span class="block h-11 w-36 overflow-hidden sm:w-44 lg:w-48">
+<header class="public-header">
+    <div class="public-header__bar">
+        <a href="{{ route('home') }}" class="public-header__logo-link" aria-label="{{ $siteName }}">
+            <span class="public-header__logo-frame">
                 <img
                     src="{{ $headerLogoUrl }}"
                     alt="{{ $siteName }}"
-                    class="h-full w-full object-cover object-center"
+                    class="public-header__logo"
                     width="208"
                     height="48"
                     loading="eager"
@@ -23,9 +23,9 @@
 
         <x-public.navigation :categories="$navigationCategories ?? collect()" />
 
-        <form action="{{ route('search') }}" method="GET" class="hidden min-w-64 max-w-xs flex-1 lg:block" role="search">
+        <form action="{{ route('search') }}" method="GET" class="public-header__search" role="search">
             <label for="desktop-search" class="sr-only">Cari berita</label>
-            <div class="flex h-10 overflow-hidden rounded-sm border border-slate-300 bg-white focus-within:border-bebas-blue focus-within:ring-2 focus-within:ring-bebas-blue">
+            <div class="public-header__search-box">
                 <input
                     id="desktop-search"
                     name="q"
@@ -34,9 +34,9 @@
                     minlength="2"
                     maxlength="100"
                     placeholder="Cari berita"
-                    class="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-bebas-navy outline-none placeholder:text-bebas-gray"
+                    class="public-header__search-input"
                 >
-                <button type="submit" class="shrink-0 bg-bebas-blue px-4 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-bebas-blue focus:ring-offset-2">
+                <button type="submit" class="public-header__search-button">
                     Cari
                 </button>
             </div>
@@ -44,16 +44,16 @@
 
         <button
             type="button"
-            class="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-slate-300 text-bebas-navy hover:border-bebas-blue hover:text-bebas-blue focus:outline-none focus:ring-2 focus:ring-bebas-blue focus:ring-offset-2 lg:hidden"
+            class="public-header__menu-button"
             data-mobile-menu-button
             aria-expanded="false"
             aria-controls="mobile-navigation"
         >
             <span class="sr-only">Buka menu navigasi</span>
-            <span aria-hidden="true" class="grid gap-1">
-                <span class="block h-0.5 w-5 bg-current"></span>
-                <span class="block h-0.5 w-5 bg-current"></span>
-                <span class="block h-0.5 w-5 bg-current"></span>
+            <span aria-hidden="true" class="public-header__menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
             </span>
         </button>
     </div>

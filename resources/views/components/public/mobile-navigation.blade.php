@@ -4,7 +4,7 @@
     $currentCategorySlug = request()->route('slug');
 @endphp
 
-<nav id="mobile-navigation" class="hidden border-t border-slate-200 bg-white px-4 py-4 shadow-sm lg:hidden" data-mobile-menu aria-label="Navigasi mobile">
+<nav id="mobile-navigation" class="public-mobile-nav hidden" data-mobile-menu aria-label="Navigasi mobile">
     <form action="{{ route('search') }}" method="GET" class="mb-3" role="search">
         <label for="mobile-search" class="sr-only">Cari berita</label>
         <div class="flex h-11 overflow-hidden rounded-sm border border-slate-300 bg-white focus-within:border-bebas-blue focus-within:ring-2 focus-within:ring-bebas-blue">

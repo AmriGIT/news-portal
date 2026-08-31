@@ -13,6 +13,218 @@
     --color-bebas-light: #f2f4f7;
 }
 
+
+.public-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: 56px;
+    border-bottom: 1px solid var(--color-slate-200, #e2e8f0);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+.public-header__bar {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    height: 100%;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 1400px;
+    padding: 0 1rem;
+}
+
+.public-header__logo-link {
+    align-items: center;
+    border-radius: 0.25rem;
+    display: flex;
+    flex-shrink: 0;
+}
+
+.public-header__logo-link:focus {
+    outline: 2px solid var(--color-bebas-blue);
+    outline-offset: 2px;
+}
+
+.public-header__logo-frame {
+    display: block;
+    height: 36px;
+    overflow: hidden;
+    width: 160px;
+}
+
+.public-header__logo {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+}
+
+.public-nav {
+    align-items: center;
+    display: none;
+    flex: 0 1 auto;
+    gap: 0.25rem;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.public-nav__link {
+    border-bottom: 2px solid transparent;
+    border-radius: 0.25rem;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+}
+
+.public-nav__link:focus {
+    outline: 2px solid var(--color-bebas-blue);
+    outline-offset: 2px;
+}
+
+.public-nav__link--active {
+    border-bottom-color: var(--color-bebas-blue);
+    color: var(--color-bebas-blue);
+}
+
+.public-nav__link--inactive {
+    color: var(--color-bebas-navy);
+}
+
+.public-nav__link--inactive:hover {
+    color: var(--color-bebas-blue);
+}
+
+.public-header__search {
+    display: none;
+    flex: 0 0 20rem;
+    max-width: 20rem;
+}
+
+.public-header__search-box {
+    align-items: stretch;
+    background: white;
+    border: 1px solid var(--color-slate-300, #cbd5e1);
+    border-radius: 0.25rem;
+    display: flex;
+    height: 36px;
+    overflow: hidden;
+}
+
+.public-header__search-box:focus-within {
+    border-color: var(--color-bebas-blue);
+    box-shadow: 0 0 0 2px var(--color-bebas-blue);
+}
+
+.public-header__search-input {
+    background: transparent;
+    border: 0;
+    color: var(--color-bebas-navy);
+    flex: 1;
+    font-size: 0.875rem;
+    min-width: 0;
+    outline: none;
+    padding: 0 0.75rem;
+}
+
+.public-header__search-input::placeholder {
+    color: var(--color-bebas-gray);
+}
+
+.public-header__search-button {
+    background: var(--color-bebas-blue);
+    color: white;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0 1rem;
+}
+
+.public-header__search-button:hover {
+    background: #1d4ed8;
+}
+
+.public-header__menu-button {
+    align-items: center;
+    border: 1px solid var(--color-slate-300, #cbd5e1);
+    border-radius: 0.25rem;
+    color: var(--color-bebas-navy);
+    display: inline-flex;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.public-header__menu-button:hover {
+    border-color: var(--color-bebas-blue);
+    color: var(--color-bebas-blue);
+}
+
+.public-header__menu-button:focus {
+    outline: 2px solid var(--color-bebas-blue);
+    outline-offset: 2px;
+}
+
+.public-header__menu-icon {
+    display: grid;
+    gap: 4px;
+}
+
+.public-header__menu-icon span {
+    background: currentColor;
+    display: block;
+    height: 2px;
+    width: 20px;
+}
+
+.public-mobile-nav {
+    background: white;
+    border-top: 1px solid var(--color-slate-200, #e2e8f0);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    left: 0;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    top: 100%;
+}
+
+.public-mobile-nav.hidden {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .public-header__bar {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .public-nav {
+        display: flex;
+    }
+
+    .public-header__menu-button,
+    .public-mobile-nav {
+        display: none !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .public-header__search {
+        display: block;
+    }
+}
+
+@media (max-width: 420px) {
+    .public-header__logo-frame {
+        width: 140px;
+    }
+}
+
 .rich-content {
     color: var(--color-slate-800);
     font-size: 1.0625rem;
