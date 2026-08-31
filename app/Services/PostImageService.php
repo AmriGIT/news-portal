@@ -21,7 +21,7 @@ class PostImageService
     public function storeFeaturedImage(UploadedFile $file): array
     {
         $this->ensureImageCanBeProcessed();
-        $this->validateImageFile($file, requireMinimumDimensions: true);
+        $this->validateImageFile($file);
 
         $manager = $this->manager();
         $image = $manager->decodePath($file->getRealPath());
@@ -39,7 +39,7 @@ class PostImageService
             foreach ($paths as $variant => $path) {
                 [$width, $height] = config("media.featured.sizes.{$variant}");
 
-                $processed = (clone $image)->coverDown($width, $height);
+                $processed = (clone $image)->cover($width, $height);
                 $this->putEncodedImage($path, $processed);
             }
         } catch (Throwable $exception) {
@@ -60,7 +60,7 @@ class PostImageService
     public function storeContentImage(UploadedFile $file): string
     {
         $this->ensureImageCanBeProcessed();
-        $this->validateImageFile($file, requireMinimumDimensions: false);
+        $this->validateImageFile($file);
 
         $extension = $this->outputExtension();
         $path = $this->datedDirectory(config('media.content.directory')).'/'.Str::uuid().".{$extension}";
@@ -149,7 +149,7 @@ class PostImageService
         }
     }
 
-    private function validateImageFile(UploadedFile $file, bool $requireMinimumDimensions): void
+    private function validateImageFile(UploadedFile $file): void
     {
         if (! $file->isValid()) {
             throw new RuntimeException('Temporary file tidak ditemukan.');
@@ -169,13 +169,6 @@ class PostImageService
             throw new RuntimeException('Gambar tidak dapat diproses.');
         }
 
-        if ($requireMinimumDimensions) {
-            [$width, $height] = $dimensions;
-
-            if ($width < (int) config('media.featured.min_width', 1200) || $height < (int) config('media.featured.min_height', 675)) {
-                throw new RuntimeException('Resolusi gambar minimal 1200 x 675 piksel.');
-            }
-        }
     }
 
     private function ensureImageCanBeProcessed(): void

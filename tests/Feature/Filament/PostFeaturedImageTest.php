@@ -54,6 +54,37 @@ class PostFeaturedImageTest extends TestCase
         }
     }
 
+    public function test_admin_can_upload_small_featured_image_and_it_is_resized(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->admin()->create();
+        $category = Category::factory()->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'category_id' => $category->id,
+                'title' => 'Berita Dengan Gambar Kecil',
+                'slug' => 'berita-dengan-gambar-kecil',
+                'content' => '<p>Isi berita dengan gambar utama kecil.</p>',
+                'featured_image' => UploadedFile::fake()->image('small.jpg', 600, 400)->size(1000),
+                'featured_image_alt' => 'Gambar kecil diproses otomatis',
+                'robots_index' => true,
+                'robots_follow' => true,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertNotified();
+
+        $post = Post::query()->where('slug', 'berita-dengan-gambar-kecil')->firstOrFail();
+
+        [$width, $height] = getimagesize(Storage::disk('public')->path($post->featured_image));
+
+        $this->assertSame(1600, $width);
+        $this->assertSame(900, $height);
+    }
+
     public function test_editor_can_upload_featured_image_on_owned_draft_and_review_posts(): void
     {
         Storage::fake('public');

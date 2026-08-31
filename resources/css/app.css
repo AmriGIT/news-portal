@@ -24,6 +24,29 @@
     backdrop-filter: blur(8px);
 }
 
+.public-header ins.adsbygoogle,
+.public-header .adsbygoogle,
+.public-header .google-auto-placed,
+.public-header [id^="google_ads_iframe_"],
+.public-header [id^="aswift_"],
+.public-header iframe[src*="googleads"],
+.public-header iframe[src*="googlesyndication"] {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    max-height: 0 !important;
+    max-width: 0 !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    width: 0 !important;
+}
+
 .public-header__bar {
     align-items: center;
     display: flex;

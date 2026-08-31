@@ -1,3 +1,80 @@
+
+function headerAdSelectors() {
+    return [
+        'ins.adsbygoogle',
+        '.adsbygoogle',
+        '.google-auto-placed',
+        '[id^="google_ads_iframe_"]',
+        '[id^="aswift_"]',
+        'iframe[src*="googleads"]',
+        'iframe[src*="googlesyndication"]',
+    ];
+}
+
+function adSafeContainers() {
+    return 'main, footer, .ad-slot, .in-article-ad';
+}
+
+function isAllowedAdPlacement(element) {
+    return Boolean(element.closest(adSafeContainers()));
+}
+
+function overlapsHeader(element, header) {
+    const headerRect = header.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
+
+    if (rect.width === 0 || rect.height === 0) {
+        return false;
+    }
+
+    return rect.bottom > headerRect.top && rect.top < headerRect.bottom + 8;
+}
+
+function removeAdsFromHeader() {
+    const header = document.querySelector('[data-no-ads]');
+    const main = document.querySelector('main');
+
+    if (! header) {
+        return;
+    }
+
+    const selectors = headerAdSelectors().join(',');
+
+    header.querySelectorAll(selectors).forEach((element) => {
+        element.remove();
+    });
+
+    document.querySelectorAll(selectors).forEach((element) => {
+        if (isAllowedAdPlacement(element)) {
+            return;
+        }
+
+        const beforeMain = main && (main.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING);
+
+        if (beforeMain || overlapsHeader(element, header)) {
+            element.remove();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cleanupHeaderAds = () => window.requestAnimationFrame(removeAdsFromHeader);
+
+    removeAdsFromHeader();
+    window.addEventListener('load', cleanupHeaderAds, { once: true });
+    window.addEventListener('resize', cleanupHeaderAds);
+    [250, 750, 1500, 3000, 5000].forEach((delay) => window.setTimeout(removeAdsFromHeader, delay));
+
+    const header = document.querySelector('[data-no-ads]');
+
+    if (! header || ! window.MutationObserver) {
+        return;
+    }
+
+    const observer = new MutationObserver(cleanupHeaderAds);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const button = document.querySelector('[data-mobile-menu-button]');
     const menu = document.querySelector('[data-mobile-menu]');
@@ -65,3 +142,4 @@ document.addEventListener('DOMContentLoaded', () => {
         paragraphs[index].after(adElement);
     });
 });
+

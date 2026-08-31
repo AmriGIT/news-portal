@@ -42,6 +42,19 @@ class PostImageUrlServiceTest extends TestCase
         $this->assertStringContainsString('https://portal.test/storage/posts/featured/image-thumbnail.webp 480w', $service->srcsetAttribute('posts/featured/image.webp') ?? '');
     }
 
+    public function test_public_storage_url_override_controls_generated_storage_urls(): void
+    {
+        Config::set('app.url', 'https://www.portal.test');
+        Config::set('filesystems.disks.public.url', 'https://www.portal.test/storage');
+
+        $service = new PostImageUrlService;
+
+        $this->assertSame(
+            'https://www.portal.test/storage/posts/featured/image.webp',
+            $service->original('posts/featured/image.webp')
+        );
+    }
+
     public function test_default_image_url_comes_from_media_config(): void
     {
         Config::set('app.url', 'https://portal.test');

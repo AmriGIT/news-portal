@@ -5,7 +5,7 @@
     $headerLogoUrl = asset('images/header-logo.webp');
 @endphp
 
-<header class="public-header">
+<header class="public-header" data-no-ads>
     <div class="public-header__bar">
         <a href="{{ route('home') }}" class="public-header__logo-link" aria-label="{{ $siteName }}">
             <span class="public-header__logo-frame">

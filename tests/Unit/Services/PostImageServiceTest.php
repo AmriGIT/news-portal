@@ -32,16 +32,19 @@ class PostImageServiceTest extends TestCase
         }
     }
 
-    public function test_it_rejects_small_featured_images(): void
+    public function test_it_upscales_small_featured_images_to_standard_dimensions(): void
     {
         Storage::fake('public');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Resolusi gambar minimal 1200 x 675 piksel.');
-
-        app(PostImageService::class)->storeFeaturedImage(
+        $paths = app(PostImageService::class)->storeFeaturedImage(
             UploadedFile::fake()->image('small.jpg', 600, 400)->size(1000)
         );
+
+        Storage::disk('public')->assertExists($paths['original']);
+        [$width, $height] = getimagesize(Storage::disk('public')->path($paths['original']));
+
+        $this->assertSame(1600, $width);
+        $this->assertSame(900, $height);
     }
 
     public function test_it_rejects_non_allowed_mime_types(): void

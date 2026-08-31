@@ -24,7 +24,6 @@ use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use RuntimeException;
@@ -241,11 +240,6 @@ class PostForm
                             ->downloadable()
                             ->pasteable(false)
                             ->preventFilePathTampering()
-                            ->rule(
-                                Rule::dimensions()
-                                    ->minWidth((int) config('media.featured.min_width', 1200))
-                                    ->minHeight((int) config('media.featured.min_height', 675))
-                            )
                             ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
                                 try {
                                     return app(PostImageService::class)->storeFeaturedImage($file)['original'];
@@ -255,7 +249,7 @@ class PostForm
                                     ]);
                                 }
                             })
-                            ->helperText('JPG, PNG, atau WebP. Maksimal 5 MB. Resolusi minimal 1200 x 675 piksel. Rasio yang disarankan 16:9. Gunakan gambar berkualitas tinggi yang relevan dengan isi berita. Jika tidak mengunggah gambar, sistem akan menggunakan gambar default.'),
+                            ->helperText('JPG, PNG, atau WebP. Maksimal 5 MB. Gambar otomatis diproses menjadi rasio 16:9 dan beberapa ukuran tampilan. Gunakan gambar berkualitas tinggi yang relevan dengan isi berita. Jika tidak mengunggah gambar, sistem akan menggunakan gambar default.'),
 
                         TextInput::make('featured_image_alt')
                             ->label('Teks Alternatif')
@@ -287,11 +281,6 @@ class PostForm
                             ->downloadable()
                             ->pasteable(false)
                             ->preventFilePathTampering()
-                            ->rule(
-                                Rule::dimensions()
-                                    ->minWidth((int) config('media.featured.min_width', 1200))
-                                    ->minHeight((int) config('media.featured.min_height', 675))
-                            )
                             ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
                                 try {
                                     return app(PostImageService::class)->storeFeaturedImage($file)['original'];
