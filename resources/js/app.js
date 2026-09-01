@@ -1,77 +1,103 @@
 
-function headerAdSelectors() {
+function popupAdSelectors() {
     return [
-        'ins.adsbygoogle',
-        '.adsbygoogle',
-        '.google-auto-placed',
-        '[id^="google_ads_iframe_"]',
+        '.adsbygoogle-noablate',
+        '[data-anchor-status]',
+        '[aria-label="Advertisement"]',
+        '[aria-label="Iklan"]',
+        '[id^="google_ads_"]',
         '[id^="aswift_"]',
         'iframe[src*="googleads"]',
         'iframe[src*="googlesyndication"]',
     ];
 }
 
-function adSafeContainers() {
-    return 'main, footer, .ad-slot, .in-article-ad';
+function isOfficialAdSlot(element) {
+    return Boolean(element.closest('.ad-slot, .in-article-ad'));
 }
 
-function isAllowedAdPlacement(element) {
-    return Boolean(element.closest(adSafeContainers()));
+function isGoogleAdElement(element) {
+    return element.matches('ins.adsbygoogle, .adsbygoogle, .adsbygoogle-noablate, [id^="google_ads_"], [id^="aswift_"], [data-anchor-status]') ||
+        Boolean(element.querySelector('ins.adsbygoogle, .adsbygoogle, iframe[src*="googleads"], iframe[src*="googlesyndication"]'));
 }
 
-function overlapsHeader(element, header) {
-    const headerRect = header.getBoundingClientRect();
-    const rect = element.getBoundingClientRect();
-
-    if (rect.width === 0 || rect.height === 0) {
+function isPopupLikeElement(element, header) {
+    if (isOfficialAdSlot(element) || ! isGoogleAdElement(element)) {
         return false;
     }
 
-    return rect.bottom > headerRect.top && rect.top < headerRect.bottom + 8;
+    if (element.matches('.adsbygoogle-noablate, [data-anchor-status]')) {
+        return true;
+    }
+
+    const style = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    const headerRect = header.getBoundingClientRect();
+    const zIndex = Number.parseInt(style.zIndex, 10) || 0;
+    const isOverlayPosition = ['fixed', 'sticky'].includes(style.position);
+    const touchesHeader = rect.bottom > headerRect.top && rect.top < headerRect.bottom + 16;
+    const coversViewportEdge = rect.top <= 8 || rect.bottom >= window.innerHeight - 8;
+
+    return isOverlayPosition && (zIndex >= 100 || touchesHeader || coversViewportEdge);
 }
 
-function removeAdsFromHeader() {
+function popupContainerFor(element) {
+    return element.closest('.adsbygoogle-noablate, [data-anchor-status]') || element;
+}
+
+function resetInjectedTopSpacing(header) {
+    const maxExpectedTopSpace = header.offsetHeight + 12;
+    const hasAnchorPopup = document.querySelector('.adsbygoogle-noablate, [data-anchor-status]');
+
+    if (! hasAnchorPopup) {
+        return;
+    }
+
+    [document.documentElement, document.body].forEach((element) => {
+        const topPadding = parseFloat(window.getComputedStyle(element).paddingTop) || 0;
+        const topMargin = parseFloat(window.getComputedStyle(element).marginTop) || 0;
+
+        if (topPadding > maxExpectedTopSpace) {
+            element.style.setProperty('padding-top', '0px', 'important');
+        }
+
+        if (topMargin > maxExpectedTopSpace) {
+            element.style.setProperty('margin-top', '0px', 'important');
+        }
+    });
+}
+
+function removeAdPopups() {
     const header = document.querySelector('[data-no-ads]');
-    const main = document.querySelector('main');
 
     if (! header) {
         return;
     }
 
-    const selectors = headerAdSelectors().join(',');
+    resetInjectedTopSpacing(header);
 
-    header.querySelectorAll(selectors).forEach((element) => {
-        element.remove();
-    });
+    document.querySelectorAll(popupAdSelectors().join(',')).forEach((element) => {
+        const container = popupContainerFor(element);
 
-    document.querySelectorAll(selectors).forEach((element) => {
-        if (isAllowedAdPlacement(element)) {
-            return;
-        }
-
-        const beforeMain = main && (main.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING);
-
-        if (beforeMain || overlapsHeader(element, header)) {
-            element.remove();
+        if (isPopupLikeElement(container, header)) {
+            container.remove();
         }
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const cleanupHeaderAds = () => window.requestAnimationFrame(removeAdsFromHeader);
+    const cleanupAdPopups = () => window.requestAnimationFrame(removeAdPopups);
 
-    removeAdsFromHeader();
-    window.addEventListener('load', cleanupHeaderAds, { once: true });
-    window.addEventListener('resize', cleanupHeaderAds);
-    [250, 750, 1500, 3000, 5000].forEach((delay) => window.setTimeout(removeAdsFromHeader, delay));
+    removeAdPopups();
+    window.addEventListener('load', cleanupAdPopups, { once: true });
+    window.addEventListener('resize', cleanupAdPopups);
+    [250, 750, 1500, 3000, 5000].forEach((delay) => window.setTimeout(removeAdPopups, delay));
 
-    const header = document.querySelector('[data-no-ads]');
-
-    if (! header || ! window.MutationObserver) {
+    if (! window.MutationObserver) {
         return;
     }
 
-    const observer = new MutationObserver(cleanupHeaderAds);
+    const observer = new MutationObserver(cleanupAdPopups);
     observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
 });
 

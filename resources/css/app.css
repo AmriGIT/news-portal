@@ -17,34 +17,13 @@
 .public-header {
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 1000;
     height: 56px;
+    min-height: 56px;
+    max-height: 56px;
     border-bottom: 1px solid var(--color-slate-200, #e2e8f0);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(8px);
-}
-
-.public-header ins.adsbygoogle,
-.public-header .adsbygoogle,
-.public-header .google-auto-placed,
-.public-header [id^="google_ads_iframe_"],
-.public-header [id^="aswift_"],
-.public-header iframe[src*="googleads"],
-.public-header iframe[src*="googlesyndication"] {
-    display: none !important;
-    height: 0 !important;
-    margin: 0 !important;
-    max-height: 0 !important;
-    max-width: 0 !important;
-    min-height: 0 !important;
-    min-width: 0 !important;
-    opacity: 0 !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    pointer-events: none !important;
-    position: absolute !important;
-    visibility: hidden !important;
-    width: 0 !important;
 }
 
 .public-header__bar {
@@ -55,6 +34,8 @@
     justify-content: space-between;
     margin: 0 auto;
     max-width: 1400px;
+    position: relative;
+    z-index: 2;
     padding: 0 1rem;
 }
 
